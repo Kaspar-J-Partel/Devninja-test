@@ -1,0 +1,25 @@
+.searchbar {
+    position: relative;
+    margin-bottom: 1.5em;
+}
+
+.searchbar > input {
+    width: 100%;
+    font-size: 1.3em;
+    padding: 0.7em 0.4em;
+}
+
+.dropdown {
+    position: absolute;
+    width: 100%;
+    background: lightyellow;
+    top: 100%;
+    left: 0;
+    padding: 1em;
+}
+
+.beer_item {
+    margin-bottom: 0.3em;
+    padding: 0.5em;
+    cursor: pointer;
+}

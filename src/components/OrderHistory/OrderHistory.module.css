@@ -1,0 +1,39 @@
+.header {
+    font-size: 3em;
+}
+
+.history_container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2em;
+
+}
+
+.order_wrapper {
+    margin-bottom: 1em;
+    padding: 1em;
+    border: 1px solid gray;
+}
+
+/*.order_wrapper:last-child {*/
+/*    justify-self: flex-start;*/
+/*}*/
+
+.header {
+    margin-bottom: 2em;
+}
+
+.order_header {
+    margin-bottom: 0.5em;
+}
+
+.beer_item {
+    list-style-type: none;
+    margin-top: 1em;
+}
+
+.count {
+    background: lightgray;
+    padding: 0.3em;
+}

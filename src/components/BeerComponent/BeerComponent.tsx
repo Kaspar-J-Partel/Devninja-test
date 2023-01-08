@@ -1,3 +1,5 @@
+import styles from "./BeerComponent.module.css";
+
 interface Beer {
     id: number
     uid: string
@@ -12,12 +14,21 @@ interface Beer {
     blg: string
 }
 
-const BeerComponent= (beer: Beer) => {
+interface Props {
+    beer: Beer
+    addSingleBeerToOpenOrder: (beer: Beer) => void
+}
+
+const BeerComponent = ({beer, addSingleBeerToOpenOrder}: Props) => {
     return (
-        <div>
-            {beer.name}
-            {beer.style}
-            {beer.alcohol}
+        <div className={styles.beer_wrapper} key={beer.uid}>
+            <div className={styles.beer_info}>
+                <h3>{beer.name} - {beer.brand}</h3>
+                <p>{beer.style}</p>
+                <p><b>{beer.alcohol}</b></p>
+            </div>
+
+            <span className={styles.adding_btn} onClick={() => addSingleBeerToOpenOrder(beer)}>+</span>
         </div>
     )
 }

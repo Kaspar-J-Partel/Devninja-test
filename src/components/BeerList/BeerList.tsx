@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import styles from "./BeerList.module.css";
+import {BeerComponent, SearchBar} from "../index";
 
 interface Beer {
     id: number
@@ -46,15 +47,17 @@ const BeerList = () => {
 
     useEffect(() => {
         setVisibleBeerList(beerList);
-        filterCategories(beerList);
+        mapCategories(beerList);
     }, [beerList])
 
-    const filterCategories = (beerList: Beer[]) => {
+    // mapCategories maps out all unique categories and corresponding beers - map[beer.style]beer
+    const mapCategories = (beerList: Beer[]) => {
         beerList.forEach(beer => {
             setCategoriesMap(new Map(categoriesMap.set(beer.style, [...(categoriesMap.get(beer.style) || []), beer])))
         })
     }
 
+    // addSingleBeerToOpenOrder adds single beer to open order
     const addSingleBeerToOpenOrder = (beer: Beer) => {
         const order = localStorage.getItem("order");
 
@@ -66,8 +69,7 @@ const BeerList = () => {
             let itemIndex = items.findIndex(el => el.uid === beer.uid);
 
             if (itemIndex >= 0) {
-                // @ts-ignore
-                items[itemIndex].count++
+                items[itemIndex].count!++
 
                 localStorage.setItem("order", JSON.stringify(items));
             } else {
@@ -77,15 +79,15 @@ const BeerList = () => {
         }
     }
 
+    // addCategoryToOpenOrder adds all beers of category to open order
     const addCategoryToOpenOrder = (category: Beer[]) => {
         category.forEach(beer => addSingleBeerToOpenOrder(beer));
     }
 
     return (
-        <main className={styles.container}>
-            <form className={styles.searchbar}>
-                <input type="text" placeholder="Search for a beer"/>
-            </form>
+        <>
+            <SearchBar beerList={beerList} setVisibleBeerList={setVisibleBeerList}
+                       setSelectedCategory={setSelectedCategory}/>
 
             <div className={styles.category_container}>
                 <div className={styles.category_wrapper} onClick={() => {
@@ -95,17 +97,17 @@ const BeerList = () => {
                     <h3>All</h3>
                 </div>
 
-
                 {Array.from(categoriesMap.keys()).map((key, i) => (
                     <div key={i} className={styles.category_wrapper} onClick={() => {
                         setVisibleBeerList(categoriesMap.get(key) || []);
                         setSelectedCategory(key);
                     }}>
                         <h3>{key}</h3>
-                        <div className={styles.category_adding__container}>
-                            <span className={styles.adding_btn}
-                                  onClick={() => addCategoryToOpenOrder(categoriesMap.get(key) || [])}>+</span>
-                        </div>
+                        <span className={styles.adding_btn}
+                              onClick={(e) => {
+                                  e.stopPropagation()
+                                  addCategoryToOpenOrder(categoriesMap.get(key) || [])
+                              }}>+</span>
                     </div>
                 ))}
             </div>
@@ -114,19 +116,10 @@ const BeerList = () => {
 
             <div className={styles.beer_container}>
                 {visibleBeerList?.map(beer => (
-                    <div className={styles.beer_wrapper} key={beer.uid}>
-                        <div className={styles.beer_info}>
-                            <h3>{beer.name}</h3>
-                            <p>{beer.style}</p>
-                            <p><b>{beer.alcohol}</b></p>
-                        </div>
-                        <div className={styles.beer_adding__container}>
-                            <span className={styles.adding_btn} onClick={() => addSingleBeerToOpenOrder(beer)}>+</span>
-                        </div>
-                    </div>
+                    <BeerComponent key={beer.uid} beer={beer} addSingleBeerToOpenOrder={addSingleBeerToOpenOrder}/>
                 ))}
             </div>
-        </main>
+        </>
     )
 }
 
