@@ -1,4 +1,5 @@
 import styles from "./BeerComponent.module.css";
+import React from "react";
 
 interface Beer {
     id: number
@@ -17,9 +18,10 @@ interface Beer {
 interface Props {
     beer: Beer
     addSingleBeerToOpenOrder: (beer: Beer) => void
+    setMessage: React.Dispatch<React.SetStateAction<string>>
 }
 
-const BeerComponent = ({beer, addSingleBeerToOpenOrder}: Props) => {
+const BeerComponent = ({beer, addSingleBeerToOpenOrder, setMessage}: Props) => {
     return (
         <div className={styles.beer_wrapper} key={beer.uid}>
             <div className={styles.beer_info}>
@@ -28,7 +30,10 @@ const BeerComponent = ({beer, addSingleBeerToOpenOrder}: Props) => {
                 <p><b>{beer.alcohol}</b></p>
             </div>
 
-            <span className={styles.adding_btn} onClick={() => addSingleBeerToOpenOrder(beer)}>+</span>
+            <span className={styles.adding_btn} onClick={() => {
+                addSingleBeerToOpenOrder(beer)
+                setMessage("Added to cart!")
+            }}>+</span>
         </div>
     )
 }

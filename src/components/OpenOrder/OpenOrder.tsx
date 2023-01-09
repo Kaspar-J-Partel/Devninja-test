@@ -25,7 +25,6 @@ const OpenOrder = () => {
         if (!items) return;
 
         const parsedItems = JSON.parse(items)
-
         setItemsArr(() => parsedItems);
     }, [])
 
@@ -55,41 +54,36 @@ const OpenOrder = () => {
         let arr: Beer[] = [...itemsArr];
         const index = arr.findIndex(el => el.uid === beer.uid);
 
-        if (index >= 0) {
-            if (arr[index].count > 1) {
-                arr[index].count--
-            } else {
-                arr.splice(index, 1);
-            }
-
-            setItemsArr(() => arr);
+        // Item not found in array
+        if (index === -1) {
+            return
         }
 
+        if (arr[index].count > 1) {
+            arr[index].count--
+        } else {
+            arr.splice(index, 1);
+        }
+
+        setItemsArr(() => arr);
         localStorage.setItem("order", JSON.stringify(arr));
     }
 
     // removeCategory removes whole category from open order
     const removeCategory = (categoryName: string) => {
         categoriesMap.delete(categoryName)
-        setCategoriesMap(new Map(categoriesMap));
+        setCategoriesMap(() => new Map(categoriesMap));
 
-        const allMapItems: Beer[] = [];
+        const mapValues: Beer[] = [];
 
         for (let arr of categoriesMap.values()) {
             for (let value of arr) {
-                allMapItems.push(value);
+                mapValues.push(value);
             }
         }
 
-        localStorage.setItem("order", JSON.stringify(allMapItems));
-
-        const items = localStorage.getItem("order");
-        if (!items) {
-            setItemsArr([]);
-            return
-        }
-
-        setItemsArr(JSON.parse(items));
+        setItemsArr(() => mapValues);
+        localStorage.setItem("order", JSON.stringify(mapValues));
     }
 
     // handleClick handles removal of beer from open order
@@ -98,16 +92,13 @@ const OpenOrder = () => {
 
         const history = localStorage.getItem("history");
 
-        const setHistory = () => {
-            if (history) {
-                localStorage.setItem("history", JSON.stringify([...JSON.parse(history), itemsArr]))
-            } else {
-                localStorage.setItem("history", JSON.stringify([itemsArr]))
-            }
+        if (history) {
+            localStorage.setItem("history", JSON.stringify([...JSON.parse(history), itemsArr]))
+        } else {
+            localStorage.setItem("history", JSON.stringify([itemsArr]))
         }
 
-        setHistory()
-
+        // Clear active order
         localStorage.removeItem("order");
         setItemsArr([]);
     }
@@ -118,7 +109,8 @@ const OpenOrder = () => {
             <div className={styles.category_container}>
                 {itemsArr.length > 0 ? Array.from(categoriesMap.keys()).map((category, index) => (
                     <div key={index} className={styles.category_wrapper}>
-                        <h3>{category} <span className={styles.remove_btn} onClick={() => removeCategory(category)}>-</span></h3>
+                        <h3>{category} <span className={styles.remove_btn}
+                                             onClick={() => removeCategory(category)}>-</span></h3>
                         <ul>
                             {(categoriesMap.get(category) || []).sort(sortBeersByAlcohol).map(beer => (
                                 <li className={styles.beer_item} key={beer.uid}><span

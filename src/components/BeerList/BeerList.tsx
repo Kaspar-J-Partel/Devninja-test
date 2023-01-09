@@ -34,6 +34,7 @@ const BeerList = () => {
     const [visibleBeerList, setVisibleBeerList] = useState<Beer[]>([]);
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [categoriesMap, setCategoriesMap] = useState(new Map<string, Beer[]>());
+    const [message, setMessage] = useState("");
 
     const dataFetchedRef = useRef(false); // strict mode runs useeffect hook twice
 
@@ -50,6 +51,11 @@ const BeerList = () => {
         mapCategories(beerList);
     }, [beerList])
 
+    useEffect(() => {
+        const timer = setTimeout(() => setMessage(""), 1000);
+        return () => clearTimeout(timer);
+    }, [message])
+
     // mapCategories maps out all unique categories and corresponding beers - map[beer.style]beer
     const mapCategories = (beerList: Beer[]) => {
         beerList.forEach(beer => {
@@ -64,18 +70,18 @@ const BeerList = () => {
         if (order === null) {
             beer.count = 1;
             localStorage.setItem("order", JSON.stringify([beer]));
+            return
+        }
+
+        let items: Beer[] = JSON.parse(order);
+        let itemIndex = items.findIndex(el => el.uid === beer.uid);
+
+        if (itemIndex >= 0) {
+            items[itemIndex].count!++
+            localStorage.setItem("order", JSON.stringify(items));
         } else {
-            let items: Beer[] = JSON.parse(order);
-            let itemIndex = items.findIndex(el => el.uid === beer.uid);
-
-            if (itemIndex >= 0) {
-                items[itemIndex].count!++
-
-                localStorage.setItem("order", JSON.stringify(items));
-            } else {
-                beer.count = 1
-                localStorage.setItem("order", JSON.stringify([...items, beer]))
-            }
+            beer.count = 1
+            localStorage.setItem("order", JSON.stringify([...items, beer]))
         }
     }
 
@@ -107,16 +113,21 @@ const BeerList = () => {
                               onClick={(e) => {
                                   e.stopPropagation()
                                   addCategoryToOpenOrder(categoriesMap.get(key) || [])
+                                  setMessage("Added to cart!")
                               }}>+</span>
                     </div>
                 ))}
             </div>
 
-            <h2>{selectedCategory}</h2>
+            <div className={styles.info_wrapper}>
+                <h2>{selectedCategory}</h2>
+                {message ? <div>{message}</div> : <></>}
+            </div>
 
             <div className={styles.beer_container}>
                 {visibleBeerList?.map(beer => (
-                    <BeerComponent key={beer.uid} beer={beer} addSingleBeerToOpenOrder={addSingleBeerToOpenOrder}/>
+                    <BeerComponent key={beer.uid} beer={beer} addSingleBeerToOpenOrder={addSingleBeerToOpenOrder}
+                                   setMessage={setMessage}/>
                 ))}
             </div>
         </>
