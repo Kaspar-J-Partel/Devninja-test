@@ -35,12 +35,14 @@ const SearchBar = ({beerList, setVisibleBeerList, setSelectedCategory}: Props) =
         if (search === "") {
             setVisibleBeerList(() => [...beerList])
             setSelectedCategory(() => `All`)
+            return
         }
+
+        filterOptions()
     }, [search])
 
     const handleChange = (value: string) => {
         setSearch(() => value)
-        filterOptions()
     }
 
     const filterOptions = () => {
