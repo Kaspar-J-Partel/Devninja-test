@@ -52,9 +52,13 @@ const SearchBar = ({beerList, setVisibleBeerList, setSelectedCategory}: Props) =
 
     return (
         <form className={styles.searchbar}>
-            <input type="text" placeholder="Search for a beer" onChange={(e) => {
+            <datalist id="beerdata">
+                {options.map(beer => <option>{beer.name}</option>)}
+            </datalist>
+
+            <input list="beerdata" type="text" placeholder="Search for a beer" onChange={(e) => {
                 handleChange(e.target.value)
-            }} value={search}/>
+            }} value={search} autoComplete="off"/>
         </form>
     )
 }
